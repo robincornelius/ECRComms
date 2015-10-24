@@ -224,35 +224,12 @@ namespace libECRComms
 
                     }
 
-                    System.IO.FileStream _FileStream =
-                           new System.IO.FileStream(lfd.FileName, System.IO.FileMode.Open,
-                                                    System.IO.FileAccess.Read);
 
-                      byte[] header = new byte[6];
+                    data = DataFile.loadbinaryfile(lfd.FileName).ToList();
 
 
-                      _FileStream.Read(header, 0, 6);
+                   // comboBox_ECRfiles.SelectedIndex = header[4];
 
-                     //Version check
-                      if (header[0] != 0xFF && header[1] != 0xFE && header[2] != 0x06 && header[3] != 0x01 && header[5] != 0xFF)
-                      {
-                          MessageBox.Show("Unknown/Incompatable file, header is wrong");
-                           _FileStream.Close();
-                          return;
-                      }
-
-                    //Header is good continue
-
-                    comboBox_ECRfiles.SelectedIndex = header[4];
-
-                    data = new List<byte>();
-
-                    while(_FileStream.Position<_FileStream.Length)
-                    {
-                     data.Add((byte)_FileStream.ReadByte());
-                    }
-
-                    _FileStream.Close();
 
                     string tmpfile = Path.Combine(Program.RWpath, "data.dat");
                     File.WriteAllBytes(tmpfile, data.ToArray());
@@ -306,6 +283,18 @@ namespace libECRComms
 
                 }
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+            if(comboBox_ECRfiles.SelectedIndex==7)
+            {
+                Descriptor d = new Descriptor(data.ToArray());
+                d.dump();
+
+            }
+
         }
     }
 }

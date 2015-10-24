@@ -32,6 +32,10 @@
             this.comboBox_ECRfiles = new System.Windows.Forms.ComboBox();
             this.hexBox1 = new Be.Windows.Forms.HexBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.button_backup = new System.Windows.Forms.Button();
+            this.button_load = new System.Windows.Forms.Button();
+            this.button_save = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.button_edit = new System.Windows.Forms.Button();
             this.button_upload = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -41,10 +45,7 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.button_save = new System.Windows.Forms.Button();
-            this.button_load = new System.Windows.Forms.Button();
-            this.button_backup = new System.Windows.Forms.Button();
+            this.button_parse = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -111,6 +112,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.button_parse);
             this.splitContainer1.Panel1.Controls.Add(this.button_backup);
             this.splitContainer1.Panel1.Controls.Add(this.button_load);
             this.splitContainer1.Panel1.Controls.Add(this.button_save);
@@ -128,6 +130,46 @@
             this.splitContainer1.Size = new System.Drawing.Size(862, 567);
             this.splitContainer1.SplitterDistance = 197;
             this.splitContainer1.TabIndex = 9;
+            // 
+            // button_backup
+            // 
+            this.button_backup.Location = new System.Drawing.Point(508, 33);
+            this.button_backup.Name = "button_backup";
+            this.button_backup.Size = new System.Drawing.Size(134, 23);
+            this.button_backup.TabIndex = 14;
+            this.button_backup.Text = "Backup all files";
+            this.button_backup.UseVisualStyleBackColor = true;
+            this.button_backup.Click += new System.EventHandler(this.button_backup_Click);
+            // 
+            // button_load
+            // 
+            this.button_load.Location = new System.Drawing.Point(340, 62);
+            this.button_load.Name = "button_load";
+            this.button_load.Size = new System.Drawing.Size(134, 23);
+            this.button_load.TabIndex = 13;
+            this.button_load.Text = "Load from Disk";
+            this.button_load.UseVisualStyleBackColor = true;
+            this.button_load.Click += new System.EventHandler(this.button_load_Click);
+            // 
+            // button_save
+            // 
+            this.button_save.Enabled = false;
+            this.button_save.Location = new System.Drawing.Point(340, 33);
+            this.button_save.Name = "button_save";
+            this.button_save.Size = new System.Drawing.Size(134, 23);
+            this.button_save.TabIndex = 12;
+            this.button_save.Text = "Save to Disk";
+            this.button_save.UseVisualStyleBackColor = true;
+            this.button_save.Click += new System.EventHandler(this.button_save_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(29, 36);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(23, 13);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "File";
             // 
             // button_edit
             // 
@@ -208,45 +250,15 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
-            // label1
+            // button_parse
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(29, 36);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(23, 13);
-            this.label1.TabIndex = 11;
-            this.label1.Text = "File";
-            // 
-            // button_save
-            // 
-            this.button_save.Enabled = false;
-            this.button_save.Location = new System.Drawing.Point(340, 33);
-            this.button_save.Name = "button_save";
-            this.button_save.Size = new System.Drawing.Size(134, 23);
-            this.button_save.TabIndex = 12;
-            this.button_save.Text = "Save to Disk";
-            this.button_save.UseVisualStyleBackColor = true;
-            this.button_save.Click += new System.EventHandler(this.button_save_Click);
-            // 
-            // button_load
-            // 
-            this.button_load.Location = new System.Drawing.Point(340, 62);
-            this.button_load.Name = "button_load";
-            this.button_load.Size = new System.Drawing.Size(134, 23);
-            this.button_load.TabIndex = 13;
-            this.button_load.Text = "Load from Disk";
-            this.button_load.UseVisualStyleBackColor = true;
-            this.button_load.Click += new System.EventHandler(this.button_load_Click);
-            // 
-            // button_backup
-            // 
-            this.button_backup.Location = new System.Drawing.Point(508, 33);
-            this.button_backup.Name = "button_backup";
-            this.button_backup.Size = new System.Drawing.Size(134, 23);
-            this.button_backup.TabIndex = 14;
-            this.button_backup.Text = "Backup all files";
-            this.button_backup.UseVisualStyleBackColor = true;
-            this.button_backup.Click += new System.EventHandler(this.button_backup_Click);
+            this.button_parse.Location = new System.Drawing.Point(32, 91);
+            this.button_parse.Name = "button_parse";
+            this.button_parse.Size = new System.Drawing.Size(134, 23);
+            this.button_parse.TabIndex = 15;
+            this.button_parse.Text = "parse";
+            this.button_parse.UseVisualStyleBackColor = true;
+            this.button_parse.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form3
             // 
@@ -290,5 +302,6 @@
         private System.Windows.Forms.Button button_load;
         private System.Windows.Forms.Button button_save;
         private System.Windows.Forms.Button button_backup;
+        private System.Windows.Forms.Button button_parse;
     }
 }

@@ -43,7 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClerkData.cs" />
+    <Compile Include="Descriptor.cs" />
     <Compile Include="ECRComms.cs" />
+    <Compile Include="File.cs" />
     <Compile Include="PLU.cs" />
     <Compile Include="Progress.cs">
       <SubType>Form</SubType>
