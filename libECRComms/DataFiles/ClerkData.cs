@@ -58,7 +58,7 @@ namespace libECRComms
         public int Length;
         public int ClerkCount;
 
-        public int MaxClerkCount;
+        public int MaxCount = 10;
         public int NameLength;
         public int ClerkCodePos;
         public int TrainPos;
@@ -66,18 +66,18 @@ namespace libECRComms
 
         public ClerkData()
         {
-            name = new string[MaxClerkCount];
-            clerk_code = new int[MaxClerkCount];
-            draw_assign = new int[MaxClerkCount];
-            training = new bool[MaxClerkCount];
-            ClerkCount = MaxClerkCount;
+            name = new string[MaxCount];
+            clerk_code = new int[MaxCount];
+            draw_assign = new int[MaxCount];
+            training = new bool[MaxCount];
+            ClerkCount = MaxCount;
         }
 
 
         public override void decode()
         {
 
-            for (int n = 0; n < MaxClerkCount; n++)
+            for (int n = 0; n < MaxCount; n++)
             {
                 name[n] = ECRComms.gettext(data, n * Length, NameLength);
                 clerk_code[n] = ECRComms.extractint3(data, n * Length + ClerkCodePos); //Is this really an INT4???? there is a spare 0 in the data field
@@ -90,7 +90,7 @@ namespace libECRComms
 
         public override void encode()
         {
-            for (int n = 0; n < MaxClerkCount; n++)
+            for (int n = 0; n < MaxCount; n++)
             {
                 ECRComms.puttext(data, n * Length, NameLength, name[n]);
                 ECRComms.putint3(data, n * Length + ClerkCodePos, clerk_code[n]);

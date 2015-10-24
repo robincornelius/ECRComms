@@ -49,6 +49,18 @@ namespace libECRComms.DataFiles
     public abstract class GroupData : data_serialisation
     {
 
+        protected int Length;
+
+        protected int NameLength;
+
+        protected int flags_pos;
+
+        public int MaxCount;
+
+        public string[] name;
+
+        public int[] status;
+
         public GroupData()
         {
 
@@ -56,19 +68,46 @@ namespace libECRComms.DataFiles
 
         public override void decode()
         {
+            for (int n = 0; n < MaxCount; n++)
+            {
+                name[n] = ECRComms.gettext(data, n * Length, NameLength);
+                status[n] = ECRComms.extractint1(data, n * Length + 0x01);
+            }
         }
 
         public override void encode()
         {
+            for (int n = 0; n < MaxCount; n++)
+            {
+                ECRComms.puttext(data, n * Length, NameLength, name[n]);
+                ECRComms.putint1(data, n * Length + 0x01, status[n]);
+            }
         }
     }
 
 
      public class GroupData1 : GroupData
      {
+         enum flags //valid on ER230 so far confirmed
+         {
+             add_group_total_pos = 0x01,
+             send_to_kp = 0x02,
+             port1 = 0x04,
+             port2 = 0x08,
+             recipt = 0x10,
+             print_red_kp = 0x20,
+         }
+
         public GroupData1()
         {
+            Length = 17; //ER230M confirmed
+            NameLength = 12;
+            flags_pos = 13;
 
+            MaxCount = 30;
+
+            name = new string[MaxCount];
+            status = new int[MaxCount];
         }
      }
 }
