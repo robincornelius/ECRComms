@@ -22,8 +22,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
-// ER380M PLU format 55 bytes??
+// ER380M PLU format 54 bytes on my eeprom anyway i know others are different
+// The ER380M PC app makes 52 byte PLUS with a different layout
+
 /*
  * |----BARCODE ------------|---------------DESCRIPTION---------------------------|
  * 00 3F 42 0F 00 FF E0 F5 05 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
@@ -36,6 +39,25 @@ using System.Text;
  * 
  */
 
+/*
+ * 00-08 (8) Barcode
+ * 09-27 (18) Description
+ * 28-30 (3) Groups
+ * 31-34 (4) Status
+ * 35 (1) Tare
+ * 36-39 (4) ??????
+ * 40 (1) Link
+ * 41-45 (5) ???
+ * 46 (1) Mix and Match ?????
+ * 47-49 (3) Price Halo
+ * 50-52 (3) Price Level 2 > ??? Guess ??? 
+ * 53 (1) NULL
+ * 
+ * Mix and match is missing (single byte)
+ * Stock is this in  the PLU file or a seperate table only?
+ * Price2 seems to be around but not accessable via till keyboard it should live around 50-53 area
+ * 
+ * 
 /* ER-230 PLU format 46 bytes
  
  * |----BARCODE ------------|---------------DESCRIPTION---------------------------|
@@ -47,9 +69,84 @@ using System.Text;
  
  */
 
+/* Status format 
+ * 
+ * IGNORE THE FUCKING MANUAL
+ * 
+ * BYTE 1 0x03
+ * 0x01 PLU is preset *
+ * 0x02 PLU is override *
+ * 0x04 PLU is tax rate 1
+ * 0x08 PLU is tax rate 2
+ * 0x10 PLU is tax rate 3
+ * 0x20 PLU is tax rate 4
+ * 0x40 PLU is food stamp eligable
+ * 0x80 NEGATIVE ITEM
+ * 
+ * BYTE 2 0x00
+ * 0x01 HASH
+ * 0x02 SINGLE ITEM
+ * 0x04 COMP NON ADD NUMBER
+ * 0x08 GALLONAGE
+ * 0x10 INVENTORY
+ * 0x20 INACTIVE
+
+ * BYTE 3 0x7c
+ * 0x01 Condiment
+ * 0x02 Compulsory Condiment entry
+ * 0x04 PLU on recipt *
+ * 0x08 N/A
+ * 0x10 PLU on check *
+ * 0x20 Price on recipt *
+ * 0x40 Price on check *
+ * 0x80 disable promo
+ * 
+ * BYTE 4 0x0c
+ * 0x01 Allow discounts/Counter not reset
+ * 0x02 PLU is preset override MGR
+ * 0x04 Price change item *?? 
+ * 0x08 ??????? *
+ * TBH all seems like bullshit at this point just set to 0x0c
+*/
+
+
+
 
 namespace libECRComms
 {
+
+    public enum statusbytes
+    {
+        status_PLU_preset = 0x01,
+        status_PLU_overide = 0x02,
+        status_PLU_tax1 = 0x04,
+        status_PLU_tax2 = 0x08,
+        status_PLU_tax3 = 0x10,
+        status_PLU_tax4 = 0x20,
+        status_PLU_foodstamp = 0x40,
+        status_PLU_neg = 0x80,
+
+        status_hash = 0x0100,
+        status_singleitem = 0x0200,
+        status_nonadd = 0x0400,
+        status_gallomnage = 0x0800,
+        status_inventory = 0x1000,
+        status_inactive = 0x2000,
+
+        status_condiment = 0x010000,
+        status_compulsary_condiment = 0x020000,
+        status_PLU_on_rcp = 0x040000,
+        status_PLU_on_check = 0x100000,
+        status_price_on_rcp = 0x200000,
+        status_price_on_check = 0x400000,
+        status_disable_promo = 0x800000,
+
+        status_preset_override_mgr  = 0x02000000,
+        status_price_change_item    = 0x04000000,
+        status_something_important  = 0x08000000,
+        status_allow_discounts      = 0x10000000,
+
+    }
 
     public abstract class data_serialisation
     {
@@ -67,6 +164,32 @@ namespace libECRComms
             return data;
         }
 
+        public void savetofile(String filename)
+        {
+
+            System.IO.StreamWriter myFile = new System.IO.StreamWriter(filename);
+
+            foreach (byte b in data)
+            {
+                myFile.Write(String.Format("{0:x2}", b));
+
+            }
+
+            myFile.Close();
+
+        }
+
+        public void loadfromfile(String filename)
+        {
+            System.IO.StreamReader myFile = new System.IO.StreamReader(filename);
+            string myString = myFile.ReadToEnd();
+            myFile.Close();
+            data = ECRComms.StringToByteArrayFastest(myString);
+            myFile.Close();
+
+            decode();
+        }
+
         public abstract void decode();
         public abstract void encode();
 
@@ -78,8 +201,8 @@ namespace libECRComms
         public string description;
         public barcode PLUcode = new barcode();
         public barcode linkPLUcode = new barcode();
-        public int price;
-        public int price2;
+        public decimal price;
+        public decimal price2;
         public int[] groups = new int[3];
         public int mixandmatch;
         public int autotare;
@@ -117,7 +240,14 @@ namespace libECRComms
 
             scode = String.Format("{0:D5}{1:D8}", upper, lower);
 
-            code = long.Parse(scode);
+            try
+            {
+                code = long.Parse(scode);
+            }
+            catch
+            {
+                Console.WriteLine("Failed to parse to valid number");
+            }
             
         }
 
@@ -146,6 +276,9 @@ namespace libECRComms
         public ER230_PLU()
         {
             data = new byte[Length];
+            status = 0x0c7c0003; //default status
+
+            //status = (int) (statusbytes.status_PLU_preset | statusbytes.status_PLU_overide | statusbytes.status_PLU_on_rcp | statusbytes.status_PLU_on_check | statusbytes.status_price_on_rcp | statusbytes.status_price_on_check | statusbytes.status_price_change_item | statusbytes.status_something_important);
         }
 
         public override void decode()
@@ -153,13 +286,30 @@ namespace libECRComms
             Buffer.BlockCopy(data, 1, PLUcode.data, 0, barcode.Length);
             PLUcode.decode();
 
-            description = Encoding.UTF8.GetString(data, 9, 18);
+            char[] desc = new char[18 - 9];
+
+            int posx=0;
+
+            for (int pos = 9; pos < 18; pos++,posx++)
+            {
+                if (data[pos] > 0x20 && data[pos] < 0x7A)
+                {
+                    desc[posx] = (char)data[pos];
+                }
+                else
+                {
+                    desc[posx] = (char) 0x20;
+                }
+            }
+
+            description = new string(desc);
 
             groups[0] = data[22];
             groups[1] = data[23];
             groups[2] = data[24];
 
-            status = (data[28] << 24) + (data[27] << 16) + (data[26] << 8) + data[25];
+            //fixme check byte order 
+            status = (data[25] << 24) + (data[26] << 16) + (data[27] << 8) + data[28];
 
             autotare = data[29];
 
@@ -168,9 +318,14 @@ namespace libECRComms
 
             mixandmatch = data[38];
 
-            price = data[39] + (data[40] << 8) + (data[41] << 16) + (data[42] << 24);
-            price2 = data[43] + (data[44] << 8) + (data[45] << 16); // One assumes price2 has a lower max limit than price due to no more packet
+            int iprice;
+            int iprice2;
 
+            iprice = data[39] + (data[40] << 8) + (data[41] << 16) + (data[42] << 24);
+            iprice2 = data[43] + (data[44] << 8) + (data[45] << 16); // One assumes price2 has a lower max limit than price due to no more packet
+
+            price = (decimal)(iprice / 100.0);
+            price2 = (decimal)(iprice2 / 100.0);
 
         }
 
@@ -186,12 +341,12 @@ namespace libECRComms
             data[23] = (byte)groups[1];
             data[24] = (byte)groups[2];
 
-            status = (data[28] << 24) + (data[27] << 16) + (data[26] << 8) + data[25];
+           // status = (data[28] << 24) + (data[27] << 16) + (data[26] << 8) + data[25];
 
-            data[25] = (byte)status;
-            data[26] = (byte)(status >> 8);
-            data[27] = (byte)(status >> 16);
-            data[28] = (byte)(status >> 24);
+            data[28] = (byte)status;
+            data[27] = (byte)(status >> 8);
+            data[26] = (byte)(status >> 16);
+            data[25] = (byte)(status >> 24);
 
             data[29] = (byte)autotare;
 
@@ -200,43 +355,146 @@ namespace libECRComms
 
             data[38] = (byte)mixandmatch;
 
-            data[39] = (byte)price;
-            data[40] = (byte)(price>>8);
-            data[41] = (byte)(price>>16);
-            data[42] = (byte)(price>>24);
+            int iprice = (int)(price * (decimal)100.0);
 
-            data[43] = (byte)price;
-            data[44] = (byte)(price>>8);
-            data[45] = (byte)(price>>16);
+            data[39] = (byte)iprice;
+            data[40] = (byte)(iprice>>8);
+            data[41] = (byte)(iprice>>16);
+            data[42] = (byte)(iprice>>24);
+
+            data[43] = (byte)iprice;
+            data[44] = (byte)(iprice>>8);
+            data[45] = (byte)(iprice>>16);
 
         }
     }
 
     public class ER380M_PLU : PLUcommon
     {
-        public const int Length = 55;
+        public const int Length = 54;
 
         public ER380M_PLU()
         {
             data = new byte[Length];
+
+            status = 0x107c0003; //default status
         }
 
         public override void decode()
         {
+          
+            //* 00-08 (8) Barcode
+
             Buffer.BlockCopy(data, 1, PLUcode.data, 0, barcode.Length);
             PLUcode.decode();
 
+            //* 09-27 (18) Description
+
             description = Encoding.UTF8.GetString(data, 9, 18);
+
+            //* 28-30 (3) Groups
+            groups[0] = data[28];
+            groups[1] = data[29];
+            groups[2] = data[30];
+
+            //* 31-34 (4) Status
+            status = (data[34] << 24) + (data[33] << 16) + (data[32] << 8) + data[31];
+
+            //* 35 (1) Tare
+
+            autotare = data[35];
+
+            //* 36 LINK 
+
+            //Dont think this fits correctly one byte short at the start because of tare is in the way
 
             Buffer.BlockCopy(data, 36, linkPLUcode.data, 0, barcode.Length);
             PLUcode.decode();
 
-           
+            //44,45,46 empty
 
+            int iprice;
+            int iprice2;
+
+            iprice = data[47] + (data[48] << 8) + (data[49] << 16);
+            price = (decimal)(iprice / 100.0);
+
+            //* 50-52 (3) Price Level 2 > ??? Guess ??? 
+
+            iprice2 = data[50] + (data[51] << 8) + (data[52] << 16);
+            price2 = (decimal)(iprice2 / 100.0);
+
+            //* 53 (1) NULL
+         
+        }
+
+        int[] GetIntArray(int num)
+        {
+            List<int> listOfInts = new List<int>();
+            while (num > 0)
+            {
+                listOfInts.Add(num % 10);
+                num = num / 10;
+            }
+            listOfInts.Reverse();
+            return listOfInts.ToArray();
         }
 
         public override void encode()
         {
+
+             //* 00-08 (8) Barcode
+
+            PLUcode.encode();
+            Buffer.BlockCopy(PLUcode.data, 0, data, 1, barcode.Length);
+
+             //* 09-27 (18) Description
+
+            byte[] b2 = System.Text.Encoding.ASCII.GetBytes(description);
+            System.Buffer.BlockCopy(b2, 0, data, 9, description.Length < 18 ? description.Length : 18);
+
+             //* 28-30 (3) Groups
+
+            data[28] = (byte)groups[0];
+            data[29] = (byte)groups[1];
+            data[30] = (byte)groups[2];
+
+             //* 31-34 (4) Status
+ 
+            data[31] = (byte)status;
+            data[32] = (byte)(status >> 8);
+            data[33] = (byte)(status >> 16);
+            data[34] = (byte)(status >> 24);
+
+             //* 35 (1) Tare
+
+            data[35] = (byte)autotare;
+
+            //* LINK 
+
+            //Dont think this fits correctly one byte short at the start because of tare is in the way
+            linkPLUcode.encode();
+            Buffer.BlockCopy(linkPLUcode.data, 0, data, 36, barcode.Length);
+           
+            //44,45,46 empty
+
+            int iprice = (int)(price * (decimal)100.0);
+            int iprice2 = (int)(price2 * (decimal)100.0);
+
+            data[47] = (byte)iprice;
+            data[48] = (byte)(iprice >> 8);
+            data[49] = (byte)(iprice >> 16);
+
+             //* 50-52 (3) Price Level 2 > ??? Guess ??? 
+
+            data[50] = (byte)iprice2;
+            data[51] = (byte)(iprice2 >> 8);
+            data[52] = (byte)(iprice2 >> 16);
+
+             //* 53 (1) NULL
+            data[53] = 0;
+         
+
         }
 
     }
