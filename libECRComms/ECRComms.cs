@@ -197,6 +197,14 @@ namespace libECRComms
             return (amount[0] << 0) + (amount[1] << 8) + (amount[2] << 16) + (amount[3] << 24);
         }
 
+        public static int extractint3(byte[] data, int pos)
+        {
+            byte[] amount = new byte[3];
+
+            Buffer.BlockCopy(data, pos, amount, 0, 3);
+            return (amount[0] << 0) + (amount[1] << 8) + (amount[2] << 16);
+        }
+
         public static int extractint2(byte[] data, int pos)
         {
             byte[] amount = new byte[2];
@@ -205,6 +213,55 @@ namespace libECRComms
             int ret = (amount[0] << 0) + (amount[1] << 8);
             return ret;
         }
+
+        public static int extractint1(byte[] data, int pos)
+        {
+            byte[] amount = new byte[2];
+
+            Buffer.BlockCopy(data, pos, amount, 0, 2);
+            int ret = (amount[0] << 0);
+            return ret;
+        }
+
+        public static void putint4(byte[] data, int pos, int val)
+        {
+            data[pos] = (byte)val;
+            data[pos + 1] = (byte)(val << 8);
+            data[pos + 2] = (byte)(val << 16);
+            data[pos + 3] = (byte)(val << 24);
+        }
+
+        public static void putint3(byte[] data, int pos, int val)
+        {
+            data[pos] = (byte) val;
+            data[pos+1] = (byte)(val<<8);
+            data[pos+2] = (byte)(val<<16);
+        }
+
+        public static void putint2(byte[] data, int pos, int val)
+        {
+            data[pos] = (byte)val;
+            data[pos + 1] = (byte)(val << 8);
+            data[pos + 2] = (byte)(val << 16);
+        }
+
+        public static void putint1(byte[] data, int pos, int val)
+        {
+            data[pos] = (byte)val;
+        }
+
+        public static string gettext(byte[] data, int pos, int len)
+        {
+            string txt = System.Text.Encoding.ASCII.GetString(data.SubArray(pos, len));
+            txt = txt.Replace("\0", string.Empty);
+            return txt;
+        }
+
+        public static void puttext(byte[] data, int pos, int len,string txt)
+        {
+            Array.Copy(Encoding.ASCII.GetBytes(txt), 0, data, pos, txt.Length < len ? txt.Length : len);
+        }
+
 
        public bool init()
        {

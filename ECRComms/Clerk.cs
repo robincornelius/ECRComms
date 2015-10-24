@@ -26,14 +26,14 @@ namespace libECRComms
             cd.Clear();
             listView1.Items.Clear();
 
-            List<List<byte>> chunks = ECRComms.chunk(data, (int)ClerkData.Length);
+           // List<List<byte>> chunks = ECRComms.chunk(data, (int)ClerkData.Length);
 
-            foreach (List<byte> c in chunks)
-            {
-                ClerkData thecd = new ClerkData();
-                thecd.frombytes(c.ToArray());
-                cd.Add(thecd);
-            }
+          //  foreach (List<byte> c in chunks)
+          //  {
+          //      ClerkData thecd = new ClerkData();
+          //      thecd.frombytes(c.ToArray());
+           //     cd.Add(thecd);
+           // }
 
 
             foreach (ClerkData c in cd)

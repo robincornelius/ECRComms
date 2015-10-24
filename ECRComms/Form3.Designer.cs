@@ -122,6 +122,7 @@
             this.splitContainer1.Panel1.Controls.Add(this.button_download);
             this.splitContainer1.Panel1.Controls.Add(this.comboBox_ECRfiles);
             this.splitContainer1.Panel1.Controls.Add(this.menuStrip1);
+            this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
             // 
             // splitContainer1.Panel2
             // 
@@ -269,6 +270,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form3";
             this.Text = "ECR Control";
+            this.Load += new System.EventHandler(this.Form3_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
