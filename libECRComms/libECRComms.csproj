@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="DataFiles\ClerkData.cs" />
     <Compile Include="DataFiles\Descriptor.cs" />
-    <Compile Include="DataFiles\Machines.cs" />
     <Compile Include="ECRComms.cs" />
     <Compile Include="File.cs" />
     <Compile Include="DataFiles\PLU.cs" />
