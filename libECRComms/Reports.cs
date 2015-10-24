@@ -13,7 +13,7 @@ namespace libECRComms
         public double quantity;
         public double value;
 
-        public string ToString()
+        public override string ToString()
         {
             return String.Format("{0} {1} {2} {3}", PLU.code, Description, quantity, value);
 

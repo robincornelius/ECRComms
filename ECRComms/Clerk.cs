@@ -26,7 +26,7 @@ namespace libECRComms
             cd.Clear();
             listView1.Items.Clear();
 
-            List<List<byte>> chunks = Program.ecr.chunk(data, ClerkData.Length);
+            List<List<byte>> chunks = ECRComms.chunk(data, (int)ClerkData.Length);
 
             foreach (List<byte> c in chunks)
             {

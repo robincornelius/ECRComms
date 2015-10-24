@@ -127,8 +127,6 @@ namespace libECRComms
 
         private void button_edit_Click(object sender, EventArgs e)
         {
-            if (comboBox_ECRfiles.SelectedIndex == null)
-                return;
 
             if (data == null)
                 return;

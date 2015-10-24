@@ -113,11 +113,14 @@ namespace libECRComms
                 plu.PLUcode.fromtext(textBox_PLU.Text);
                 
                 //FIX ME - exception if bad data
-                if (!int.TryParse(textBox_price1.Text, out plu.price))
+                int price;
+                if (!int.TryParse(textBox_price1.Text, out price))
                 {
                     MessageBox.Show("Price 1 not in correct format");
                     return;
                 }
+
+                plu.price = price;
 
                 plu.encode();
                
