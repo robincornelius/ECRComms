@@ -208,6 +208,27 @@ namespace libECRComms
 
     }
 
+    class PLUFactory
+    {
+        public static PLUcommon Get(MachineIDs id)
+        {
+            switch (id)
+            {
+                case MachineIDs.ER230:
+                    return new ER230_PLU();
+
+                case MachineIDs.ER380M_UK:
+                    return new ER380M_PLU();
+
+                default:
+                    return null;
+
+            }
+
+        }
+
+    }
+
     public abstract class PLUcommon : data_serialisation
     {
 
