@@ -43,7 +43,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataFiles\ClerkData.cs" />
+    <Compile Include="DataFiles\ClerkLogo.cs" />
     <Compile Include="DataFiles\Descriptor.cs" />
+    <Compile Include="DataFiles\FinancialLogo.cs" />
+    <Compile Include="DataFiles\FunctionKey.cs" />
+    <Compile Include="DataFiles\Group.cs" />
+    <Compile Include="DataFiles\Macro.cs" />
+    <Compile Include="DataFiles\Misc.cs" />
+    <Compile Include="DataFiles\MixMatch.cs" />
+    <Compile Include="DataFiles\PrintOption.cs" />
+    <Compile Include="DataFiles\SystemOptions.cs" />
+    <Compile Include="DataFiles\Tax.cs" />
     <Compile Include="ECRComms.cs" />
     <Compile Include="File.cs" />
     <Compile Include="DataFiles\PLU.cs" />
