@@ -148,6 +148,16 @@ namespace libECRComms
 
     }
 
+    public static class extension
+    {
+       public static T[] SubArray<T>(this T[] data, int index, int length)
+        {
+            T[] result = new T[length];
+            Array.Copy(data, index, result, 0, length);
+            return result;
+        }
+    }
+
     public abstract class data_serialisation
     {
         public byte[] data;
