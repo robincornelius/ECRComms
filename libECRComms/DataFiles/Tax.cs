@@ -48,6 +48,26 @@ namespace libECRComms.DataFiles
 
     public abstract class TaxData : data_serialisation
     {
+        protected int Length;
+        public int MaxCount;
+
+        protected int NameLength; //can we even change this????
+
+        protected int flags_pos;
+        protected int value_pos;
+
+        public string[] name;
+
+        public  Eflags[] flags;
+        public decimal[] value;
+
+
+        public enum Eflags
+        {
+            AddOn = 0x00,
+            Vat = 0x20,
+
+        }
 
         public TaxData()
         {
@@ -56,10 +76,22 @@ namespace libECRComms.DataFiles
 
         public override void decode()
         {
+            for (int n = 0; n < MaxCount; n++)
+            {
+                name[n] = ECRComms.gettext(data, n * Length, NameLength);
+                flags[n] = (Eflags)ECRComms.extractint1(data,n* Length + flags_pos);
+                value[n] = (decimal)ECRComms.extractfloat4(data, n * Length + value_pos);
+            }
         }
 
         public override void encode()
         {
+            for (int n = 0; n < MaxCount; n++)
+            {
+                ECRComms.puttext(data, n * Length, NameLength, name[n]);
+                ECRComms.putint1(data, n * Length + flags_pos, (int)flags[n]);
+                ECRComms.putdecimal4(data, n * Length + value_pos, value[n]);
+            }
         }
     }
 
@@ -68,6 +100,16 @@ namespace libECRComms.DataFiles
     {
         public TaxData1()
         {
+            Length = 17;
+            MaxCount = 4;
+            NameLength = 5;
+
+            flags_pos = 16;
+            value_pos = 12;
+
+            flags = new Eflags[MaxCount];
+            name = new String[MaxCount];
+            value = new decimal[MaxCount];
 
         }
     }

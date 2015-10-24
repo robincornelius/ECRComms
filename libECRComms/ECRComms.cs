@@ -195,6 +195,12 @@ namespace libECRComms
 
         }
 
+        public static void putdecimal4(byte[] data, int pos, decimal value)
+        {
+            int ivalue = (int) (value * 100);
+            putint4(data, pos, ivalue);
+        }
+
         public static int extractint4(byte[] data, int pos)
         {
             byte[] amount = new byte[4];
