@@ -112,9 +112,6 @@ using System.Collections;
  * TBH all seems like bullshit at this point just set to 0x0c
 */
 
-
-
-
 namespace libECRComms
 {
 

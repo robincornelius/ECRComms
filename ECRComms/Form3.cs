@@ -10,7 +10,6 @@ using Be.Windows.Forms;
 using System.IO;
 
 
-
 namespace libECRComms
 {
     public partial class Form3 : Form
@@ -22,6 +21,20 @@ namespace libECRComms
         {
             InitializeComponent();
             initcomms();
+
+            SystemData_ER230 d = (SystemData_ER230) SystemDataFactory.Get(MachineIDs.ER230);
+
+            d.config.Activate_open_drawer_alarm = 1;
+            d.config.allow_post_tender = 1;
+            d.config.Training_mode = 1;
+            d.config.Use_Spool = 1;
+            d.config.Draw_shut_to_operate = 1;
+
+            d.encode();
+
+            d.config.Use_Spool = 1;
+
+
         }
 
         private bool initcomms()
@@ -293,6 +306,14 @@ namespace libECRComms
                 Descriptor d = new Descriptor(data.ToArray());
                 d.dump();
 
+            }
+
+            if (comboBox_ECRfiles.SelectedIndex == 3)
+            {
+                SystemData so = SystemDataFactory.Get(MachineIDs.ER230);
+                so.data = data.ToArray();
+                so.decode();
+               
             }
 
         }
