@@ -49,4 +49,94 @@ stock control system using the PLU Files upload to add data to the ECR and the
 PLU report to get the daily sales.
 
 
+The required files for basic operation are:-
+
+ECRComms.cs (the main bit)
+PLU.cs (if you want to process PLU files)
+Stock.cs (if you want to process stock reports)
+Reports.cs (will decode some reports)
+
+Other files in tidy/ are not required as progress has no place to be in this
+lib as its a GUI component and the Datafiles in properties/ are unfinished work
+where i fleshed out each report format.
+
+So just build those 4 either as a lib or with your main program
+
+Example usage
+---------------------
+
+public static ECRComms ecr;
+ecr = new ECRComms();
+ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
+ecr.baud = 9600;
+bool success = ecr.init();
+
+if(success==false)
+{
+    Console.WriteLine("Failed to open ECR :-(");
+    return;
+}
+
+List<byte> payload;
+payload = ecr.getreport(ECRComms.reports.PLU, ECRComms.reporttype.Z1);
+
+p = new PLUReport(payload.ToArray());
+p.savetofile(path);
+
+foreach (PLUReportEntry e in p.entries)
+{
+    Console.WriteLine("We sold {0} of
+{1}",e.quantity,e.PLU.code.ToString());
+}
+
+
+That will grab the Z1 PLU report(this is just a list of barcodes/PLUs
+and the amount sold) so very useful for stock reports
+
+All other reports work in the same way, you use getreport() and the
+type of report()
+
+
+Example PLU upload
+-----------------------------
+
+Warning ensure the PLU format matches your ECR eeprom or you will end
+up with a big mess and have to reset the ECR and loose any programming
+you may have.
+
+If you are unsure first program some PLUs via the keyboard of the ECR,
+then following the example above DOWNLOAD the PLU file from the ECR
+and sent it to me robin.cornelius@gmail.com for analysis
+
+
+-----------------------------
+
+ecr = new ECRComms();
+ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
+ecr.baud = 9600;
+bool success = ecr.init();
+
+if (success == false)
+{
+    Console.WriteLine("Failed to open ECR :-(");
+    return;
+}
+
+List<data_serialisation> ds = new List<data_serialisation>();
+
+ER380M_PLU p = new ER380M_PLU();
+p.PLUcode = new barcode();
+p.PLUcode.fromtext("01234567"); //this is your barcode/plu/sku codes
+p.PLUcode.encode();
+
+p.price = price;
+p.description = "Name of stock" //first 12 letters appear on recipt
+p.encode();
+
+ds.Add(p);
+
+//add as many plus as you want to ds
+
+ ecr.setprogram(ECRComms.program.PLU, ds);
+
 
