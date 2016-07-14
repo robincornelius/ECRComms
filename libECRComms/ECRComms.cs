@@ -30,16 +30,17 @@ using System.IO;
 
 namespace libECRComms
 {
+
     public class ProgressEventArgs : EventArgs
     {
         public enum ProgressState
         {
-            PROGRESS_SEND=0,
-            PROGRESS_DOWNLOAD=2,
-            PROGRESS_DONE=3,
-            PROGRESS_ERROR=4,
-            PROGRESS_UPLOAD=5,
-            PROGRESS_UPLOAD_TICK=6,
+            PROGRESS_SEND = 0,
+            PROGRESS_DOWNLOAD = 2,
+            PROGRESS_DONE = 3,
+            PROGRESS_ERROR = 4,
+            PROGRESS_UPLOAD = 5,
+            PROGRESS_UPLOAD_TICK = 6,
             PROGRESS_DOWNLOAD_TICK = 7,
         }
 
@@ -47,9 +48,9 @@ namespace libECRComms
 
         public int blockstotal;
         public int blocksdone;
-        public ProgressEventArgs(ProgressState state,int blockstotal,int blocksdone)
+        public ProgressEventArgs(ProgressState state, int blockstotal, int blocksdone)
         {
-            this.state=state;
+            this.state = state;
             this.blocksdone = blocksdone;
             this.blockstotal = blockstotal;
         }
@@ -61,8 +62,19 @@ namespace libECRComms
         ER380M_UK
     }
 
+    public static class extension
+    {
+        public static T[] SubArray<T>(this T[] data, int index, int length)
+        {
+            T[] result = new T[length];
+            Array.Copy(data, index, result, 0, length);
+            return result;
+        }
+    }
+
     public class ECRComms : IDisposable
     {
+
         public delegate void ProgressEventHandler(object sender, EventArgs e);
         public event ProgressEventHandler Progress;
 
