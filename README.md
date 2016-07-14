@@ -65,29 +65,28 @@ So just build those 4 either as a lib or with your main program
 Example usage
 ---------------------
 
-public static ECRComms ecr;
-ecr = new ECRComms();
-ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
-ecr.baud = 9600;
-bool success = ecr.init();
+    public static ECRComms ecr;
+    ecr = new ECRComms();
+    ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
+    ecr.baud = 9600;
+    bool success = ecr.init();
+    
+    if(success==false)
+    {
+        Console.WriteLine("Failed to open ECR :-(");
+        return;
+    }
 
-if(success==false)
-{
-    Console.WriteLine("Failed to open ECR :-(");
-    return;
-}
-
-List<byte> payload;
-payload = ecr.getreport(ECRComms.reports.PLU, ECRComms.reporttype.Z1);
-
-p = new PLUReport(payload.ToArray());
-p.savetofile(path);
-
-foreach (PLUReportEntry e in p.entries)
-{
-    Console.WriteLine("We sold {0} of
-{1}",e.quantity,e.PLU.code.ToString());
-}
+    List<byte> payload;
+    payload = ecr.getreport(ECRComms.reports.PLU, ECRComms.reporttype.Z1);
+    
+    p = new PLUReport(payload.ToArray());
+    p.savetofile(path);
+    
+    foreach (PLUReportEntry e in p.entries)
+    {
+        Console.WriteLine("We sold {0} of {1}",e.quantity,e.PLU.code.ToString());
+    }
 
 
 That will grab the Z1 PLU report(this is just a list of barcodes/PLUs
@@ -111,32 +110,32 @@ and sent it to me robin.cornelius@gmail.com for analysis
 
 -----------------------------
 
-ecr = new ECRComms();
-ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
-ecr.baud = 9600;
-bool success = ecr.init();
-
-if (success == false)
-{
-    Console.WriteLine("Failed to open ECR :-(");
-    return;
-}
-
-List<data_serialisation> ds = new List<data_serialisation>();
-
-ER380M_PLU p = new ER380M_PLU();
-p.PLUcode = new barcode();
-p.PLUcode.fromtext("01234567"); //this is your barcode/plu/sku codes
-p.PLUcode.encode();
-
-p.price = price;
-p.description = "Name of stock" //first 12 letters appear on recipt
-p.encode();
-
-ds.Add(p);
-
-//add as many plus as you want to ds
-
- ecr.setprogram(ECRComms.program.PLU, ds);
+    ecr = new ECRComms();
+    ecr.commport = "/dev/ttyUSB0"; //""/dev/ttyUSB0""
+    ecr.baud = 9600;
+    bool success = ecr.init();
+    
+    if (success == false)
+    {
+        Console.WriteLine("Failed to open ECR :-(");
+        return;
+    }
+    
+    List<data_serialisation> ds = new List<data_serialisation>();
+    
+    ER380M_PLU p = new ER380M_PLU();
+    p.PLUcode = new barcode();
+    p.PLUcode.fromtext("01234567"); //this is your barcode/plu/sku codes
+    p.PLUcode.encode();
+    
+    p.price = price;
+    p.description = "Name of stock" //first 12 letters appear on recipt
+    p.encode();
+    
+    ds.Add(p);
+    
+    //add as many plus as you want to ds
+    
+    ecr.setprogram(ECRComms.program.PLU, ds);
 
 
