@@ -626,8 +626,10 @@ namespace libECRComms
                 unescapepacket(rxbuffer);
 
                 // Parse the response header for number of blocks
-                blocksremaining = (rxbuffer[14]<<8) + rxbuffer[15];
-                int thisblock = (rxbuffer[16]<<8) +rxbuffer[17];
+                
+                blocksremaining = (rxbuffer[16] << 8) + rxbuffer[15];
+                int thisblock = (rxbuffer[18] << 8) + rxbuffer[17];
+
                 int no_records = rxbuffer[19];
 
                 Console.WriteLine(String.Format("NOW ON {0} remaining {2} blocksize {1}", thisblock, no_records, blocksremaining));
