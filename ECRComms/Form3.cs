@@ -21,21 +21,7 @@ namespace libECRComms
         {
             InitializeComponent();
             initcomms();
-
-            SystemData_ER230 d = (SystemData_ER230) SystemDataFactory.Get(MachineIDs.ER230);
-
-            d.config.Activate_open_drawer_alarm = 1;
-            d.config.allow_post_tender = 1;
-            d.config.Training_mode = 1;
-            d.config.Use_Spool = 1;
-            d.config.Draw_shut_to_operate = 1;
-
-            d.encode();
-
-            d.config.Use_Spool = 1;
-
-
-        }
+       }
 
         private bool initcomms()
         {

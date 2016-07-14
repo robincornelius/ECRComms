@@ -7,7 +7,7 @@
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    ECRComms is distributed in the hope that it will be useful,
+    Foobar is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -15,11 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with ECRComms.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (c) 2013 - 2015 Robin Cornelius <robin.cornelius@gmail.com>
+    Copyright (c) 2013 Robin Cornelius <robin.cornelius@gmail.com>
  */
-
-
-// ******************* PROGRAM 0 PLU DATA ************************
 
 using System;
 using System.Collections.Generic;
@@ -109,13 +106,15 @@ using System.Collections;
  * 0x02 PLU is preset override MGR
  * 0x04 Price change item *?? 
  * 0x08 ??????? *
- * TBH all seems like bullshit at this point just set this entire byte to 0x0c
+ * TBH all seems like bullshit at this point just set to 0x0c
 */
+
+
+
 
 namespace libECRComms
 {
 
-    //fix me we should also use the bitfield system here
     public enum statusbytes
     {
         status_PLU_preset = 0x01,
@@ -144,19 +143,9 @@ namespace libECRComms
 
         status_preset_override_mgr  = 0x02000000,
         status_price_change_item    = 0x04000000,
-        status_something_important  = 0x08000000, //undocumented no idea what it is
+        status_something_important  = 0x08000000,
         status_allow_discounts      = 0x10000000,
 
-    }
-
-    public static class extension
-    {
-       public static T[] SubArray<T>(this T[] data, int index, int length)
-        {
-            T[] result = new T[length];
-            Array.Copy(data, index, result, 0, length);
-            return result;
-        }
     }
 
     public abstract class data_serialisation
@@ -203,27 +192,6 @@ namespace libECRComms
 
         public abstract void decode();
         public abstract void encode();
-
-    }
-
-    class PLUFactory
-    {
-        public static PLUcommon Get(MachineIDs id)
-        {
-            switch (id)
-            {
-                case MachineIDs.ER230:
-                    return new ER230_PLU();
-
-                case MachineIDs.ER380M_UK:
-                    return new ER380M_PLU();
-
-                default:
-                    return null;
-
-            }
-
-        }
 
     }
 
@@ -341,12 +309,7 @@ namespace libECRComms
             groups[2] = data[24];
 
             //fixme check byte order 
-            //status = (data[25] << 24) + (data[26] << 16) + (data[27] << 8) + data[28];
-
-            data[28] = (byte)status;
-            data[27] = (byte)(status >> 8);
-            data[26] = (byte)(status >> 16);
-            data[25] = (byte)(status >> 24);
+            status = (data[25] << 24) + (data[26] << 16) + (data[27] << 8) + data[28];
 
             autotare = data[29];
 

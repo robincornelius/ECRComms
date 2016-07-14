@@ -12,7 +12,6 @@
     <AssemblyName>libECRComms</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +29,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,28 +42,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\DataFiles\ClerkData.cs" />
-    <Compile Include="Properties\DataFiles\ClerkLogo.cs" />
-    <Compile Include="Properties\DataFiles\Descriptor.cs" />
-    <Compile Include="Properties\DataFiles\FinancialLogo.cs" />
-    <Compile Include="Properties\DataFiles\FunctionKey.cs" />
-    <Compile Include="Properties\DataFiles\Group.cs" />
-    <Compile Include="Properties\DataFiles\Macro.cs" />
-    <Compile Include="Properties\DataFiles\Misc.cs" />
-    <Compile Include="Properties\DataFiles\MixMatch.cs" />
-    <Compile Include="Properties\DataFiles\PrintOption.cs" />
-    <Compile Include="Properties\DataFiles\SystemOptions.cs" />
-    <Compile Include="Properties\DataFiles\Tax.cs" />
+    <Compile Include="ClerkData.cs" />
     <Compile Include="ECRComms.cs" />
-    <Compile Include="File.cs" />
-    <Compile Include="Properties\DataFiles\PLU.cs" />
+    <Compile Include="PLU.cs" />
     <Compile Include="Progress.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Progress.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reports\Reports.cs" />
-    <Compile Include="Properties\DataFiles\Stock.cs" />
+    <Compile Include="Reports.cs" />
+    <Compile Include="Stock.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Progress.resx" />

@@ -142,7 +142,7 @@ namespace libECRComms.DataFiles
         [BitfieldLength(7, 1, "Print clerk name on receipt? ")]
         public byte Print_clerk_name_on_receipt;
         [BitfieldLength(7, 1, "Print Z counter on reports? ")]
-        public byte Print_Z_counter_on_reports?;
+        public byte Print_Z_counter_on_reports;
 
         [BitfieldLength(8, 1, "Home Currency symbol")]
         public byte Home_Currency_symbol;
