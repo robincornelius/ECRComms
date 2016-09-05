@@ -8,7 +8,7 @@ namespace libECRComms
 
     public class PLUReportEntry
     {
-        public string Description="";
+        public string Description = "";
         public barcode PLU;
         public double quantity;
         public double value;
@@ -35,7 +35,7 @@ namespace libECRComms
 
         public PLUReport(bool simulation)
         {
-            if(simulation==true)
+            if (simulation == true)
             {
                 Console.WriteLine("PLU report simulation==true");
                 entries = new List<PLUReportEntry>();
@@ -82,7 +82,7 @@ namespace libECRComms
             foreach (List<byte> lb in report)
             {
 
-                double qty = ECRComms.extractfloat4(lb.ToArray(),0x1b);
+                double qty = ECRComms.extractfloat4(lb.ToArray(), 0x1b);
 
                 //Int32 iqty = (lb[0x1e] << 24) + (lb[0x1d] << 16) + (lb[0x1c] << 8) + lb[0x1b];
                 //double qty = iqty / 100.0; //its not really an int its a 2 dp float
@@ -136,9 +136,9 @@ namespace libECRComms
 
         public void dump()
         {
-            foreach(PLUReportEntry p in entries)
+            foreach (PLUReportEntry p in entries)
             {
-                Console.Write(String.Format(" = {0} {1} {2} {3} \n", p.PLU.scode,p.Description, p.quantity, p.value));
+                Console.Write(String.Format(" = {0} {1} {2} {3} \n", p.PLU.scode, p.Description, p.quantity, p.value));
 
             }
 
@@ -146,35 +146,35 @@ namespace libECRComms
     }
 
 
-    public class FinReportElement: data_serialisation
+    public class FinReportElement : data_serialisation
     {
-    
-         public double count;
-         public double amount;
 
-         public FinReportElement()
-         {
-             data = new byte[12];
+        public double count;
+        public double amount;
 
-         }
-         public override void decode()
-         {
-             count = ECRComms.extractfloat4(data.ToArray(), 0);
-             amount = ECRComms.extractfloat4(data.ToArray(), 8);
-         }
+        public FinReportElement()
+        {
+            data = new byte[12];
 
-         public override void encode()
-         {
-         }
+        }
+        public override void decode()
+        {
+            count = ECRComms.extractfloat4(data.ToArray(), 0);
+            amount = ECRComms.extractfloat4(data.ToArray(), 8);
+        }
+
+        public override void encode()
+        {
+        }
     }
 
     public class FinReport : data_serialisation
     {
         public enum ele_names
         {
-            PLU_TTL=0,
-            ADJUST_TTL=2,
-            NON_TAX=3,
+            PLU_TTL = 0,
+            ADJUST_TTL = 2,
+            NON_TAX = 3,
             TAX1 = 4,//Guess
             TAX2 = 5,//Guess
             TAX3 = 6,//Guess
@@ -189,11 +189,11 @@ namespace libECRComms
             VOID_MODE = 37,
             CANCEL = 38,
             GROSSSALES = 39,
-            CASHSALES=40,
+            CASHSALES = 40,
             NOSALE = 50,//partial Guess
-            CASH_IN_D=51,
-            CHEQUE_IN_D=52, //Guess
-            CHG1_IN_D=54,
+            CASH_IN_D = 51,
+            CHEQUE_IN_D = 52, //Guess
+            CHG1_IN_D = 54,
             CHG2_IN_D = 55,
             CHG3_IN_D = 56,//Guess
             CHG4_IN_D = 57,//Guess
@@ -263,20 +263,20 @@ namespace libECRComms
 
             byte[] newArray = data.Skip(1).ToArray();
 
-           List<List<byte>> chunks = ECRComms.chunk(newArray.ToList(), 12);
+            List<List<byte>> chunks = ECRComms.chunk(newArray.ToList(), 12);
 
-           int index = 0;
+            int index = 0;
 
-           foreach(List<byte> bs in chunks)
-           {
-               FinReportElement element = new FinReportElement();
-               Array.Copy(bs.ToArray(),0, element.data,0,12);
-               element.decode();
-               elements.Add(element);
-               index++;
-           }
+            foreach (List<byte> bs in chunks)
+            {
+                FinReportElement element = new FinReportElement();
+                Array.Copy(bs.ToArray(), 0, element.data, 0, 12);
+                element.decode();
+                elements.Add(element);
+                index++;
+            }
 
-            grand = ECRComms.extractfloat3(data, 0x465); 
+            grand = ECRComms.extractfloat3(data, 0x465);
         }
 
         public override void encode()
@@ -285,7 +285,7 @@ namespace libECRComms
 
         public void dump()
         {
-            Console.WriteLine(String.Format("+PLU TTL {0} £{1}", getcount(ele_names.PLU_TTL),getvalue(ele_names.PLU_TTL)));
+            Console.WriteLine(String.Format("+PLU TTL {0} £{1}", getcount(ele_names.PLU_TTL), getvalue(ele_names.PLU_TTL)));
             Console.WriteLine(String.Format("+ADJUST TTL {0}£{1}", getcount(ele_names.ADJUST_TTL), getvalue(ele_names.ADJUST_TTL)));
             Console.WriteLine(String.Format("%1 {0} £{1}", getcount(ele_names.DISCOUNT1), getvalue(ele_names.DISCOUNT1)));
             Console.WriteLine(String.Format("NET SALE {0} £{1}", getcount(ele_names.NETSALE), getvalue(ele_names.NETSALE)));
@@ -303,4 +303,74 @@ namespace libECRComms
             Console.WriteLine(String.Format("GRAND {0} ", grand));
         }
     }
+
+    public class TimeReportElement : data_serialisation
+    {
+
+        public int count;
+        public double amount;
+
+        public TimeReportElement()
+        {
+            data = new byte[12];
+
+        }
+        public override void decode()
+        {
+            count = ECRComms.extractint2(data.ToArray(), 1);
+            amount = ECRComms.extractfloat3(data.ToArray(), 9);
+        }
+
+        public override void encode()
+        {
+        }
+    }
+
+    public class TimeReport : data_serialisation
+    {
+
+        List<TimeReportElement> elements = new List<TimeReportElement>();
+
+        public TimeReport(byte[] data)
+        {
+            if (data != null)
+            {
+                this.data = data;
+                decode();
+            }
+        }
+
+        public override void decode()
+        {
+            List<List<byte>> chunks = ECRComms.chunk(this.data.ToList(), 12);
+
+            foreach (List<byte> bs in chunks)
+            {
+                TimeReportElement element = new TimeReportElement();
+                Array.Copy(bs.ToArray(), 0, element.data, 0, 12);
+                element.decode();
+                elements.Add(element);
+            }
+        }
+
+        public override void encode()
+        {
+        }
+
+        public void dump()
+        {
+            DateTime time = new DateTime(2000, 1, 1, 0, 0, 0);
+            TimeSpan span = new TimeSpan(1, 0, 0);
+
+            foreach(TimeReportElement t in elements)
+            {
+                Console.WriteLine(String.Format("{0} - {1} Count {2} Total {3}", time.ToShortTimeString(), (time + span).ToShortTimeString(), t.count, t.amount));
+                time += span;
+            }
+
+
+        }
+
+    }
+
 }
