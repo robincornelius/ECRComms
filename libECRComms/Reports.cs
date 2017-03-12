@@ -170,48 +170,104 @@ namespace libECRComms
 
     public class FinReport : data_serialisation
     {
+        // ER380M UK list
+        // See manual "Financial Report Message" to align items with this list
         public enum ele_names
         {
             PLU_TTL = 0,
+            PLU_TTL_MINUS = 1,
             ADJUST_TTL = 2,
             NON_TAX = 3,
-            TAX1 = 4,//Guess
-            TAX2 = 5,//Guess
-            TAX3 = 6,//Guess
-            TAX4 = 7,//Guess
+            TAX1_SALES = 4,
+            TAX2_SALES = 5,
+            TAX3_SALES = 6,
+            TAX4_SALES = 7,
+            TAX1 = 8,
+            TAX2 = 9,
+            TAX3 = 10,
+            TAX4 = 11,
+            NET_TAX1 = 12,
+            NET_TAX2 = 13,
+            NET_TAX3 = 14,
+            NET_TAX4 = 15,
+            XMPT1_SALES = 16,
+            XMPT2_SALES = 17,
+            XMPT3_SALES = 18,
+            XMPT4_SALES = 19,
+            ANALYSIS2 = 20,
+            ANALYSIS3 = 21,
+            ANALYSIS1 = 22,
             DISCOUNT1 = 23,
-            DISCOUNT2 = 24,//Guess
-            DISCOUNT3 = 25,//Guess
-            DISCOUNT4 = 26,//Guess
-            DISCOUNT5 = 27,//Guess
+            DISCOUNT2 = 24,
+            DISCOUNT3 = 25,
+            DISCOUNT4 = 26,
+            DISCOUNT5 = 27,
             NETSALE = 28,
+            CREDIT_TAX1 = 29,
+            CREDIT_TAX2 = 30,
+            CREDIT_TAX3 = 31,
+            CREDIT_TAX4 = 32,
+            FDS_CREDIT = 33,
             RETURN = 34,
+            ERROR_CORR = 35,
+            PREVIOUS_VD = 36,
             VOID_MODE = 37,
             CANCEL = 38,
             GROSSSALES = 39,
             CASHSALES = 40,
-            NOSALE = 50,//partial Guess
+            CHECKSALES = 41,
+            RA_1 = 42,
+            RA_2 = 43,
+            RA_3 = 44,
+            PO_1 = 45,
+            PO_2 = 46,
+            PO_3 = 47,
+            HASH_TTL = 48,
+            AUDACTION = 49,
+            NOSALE = 50,
             CASH_IN_D = 51,
-            CHEQUE_IN_D = 52, //Guess
+            CHEQUE_IN_D = 52,
+            FDS_IN_D = 53,
             CHG1_IN_D = 54,
             CHG2_IN_D = 55,
-            CHG3_IN_D = 56,//Guess
-            CHG4_IN_D = 57,//Guess
-            CHG5_IN_D = 58,//Guess
-            CHG6_IN_D = 59,//Guess
-            CHG7_IN_D = 60,//Guess
-            CHG8_IN_D = 61,//Guess
+            CHG3_IN_D = 56,
+            CHG4_IN_D = 57,
+            CHG5_IN_D = 58,
+            CHG6_IN_D = 59,
+            CHG7_IN_D = 60,
+            CHG8_IN_D = 61,
             CHG1_SALES = 62,
-            CHG2_SALES = 63,//Guess
-            CHG3_SALES = 64,//Guess
-            CHG4_SALES = 65,//Guess
-            CHG5_SALES = 66,//Guess
-            CHG6_SALES = 67,//Guess
-            CHG7_SALES = 68,//Guess
-            CHG8_SALES = 69,//Guess
+            CHG2_SALES = 63,
+            CHG3_SALES = 64,
+            CHG4_SALES = 65,
+            CHG5_SALES = 66,
+            CHG6_SALES = 67,
+            CHG7_SALES = 68,
+            CHG8_SALES = 69,
+            FOREIGN_1 = 70,
+            FOREIGN_2 = 71,
+            FOREIGN_3 = 72,
+            FOREIGN_4 = 73,
             DWR_TTL = 74,
-            PLU_LEVEL1_TTL = 85
+            PROMO = 75,
+            WASTE = 76,
+            TIP = 77,
+            TRAIN_TTL = 78,
+            BALFORWARD = 79,
+            GUESTS = 80,
+            PBAL = 81,
+            CHECKS_PAID = 82,
+            SERVICE = 83,
+            MIXANDMATCH = 84,
+            PLU_LEVEL1_TTL = 85,
+            PLU_LEVEL2_TTL = 86,
+            MOD_1_TTL = 87,
+            MOD_2_TTL = 88,
+            MOD_3_TTL = 89,
+            MOD_4_TTL = 90,
+            MOD_5_TTL = 91,
         }
+
 
         double grand;
 
@@ -234,11 +290,25 @@ namespace libECRComms
 
         public double getvalue(ele_names ele)
         {
+            if ((int)ele > elements.Count)
+            {
+                Console.WriteLine("Element not found");
+                return 0;
+            }
+
             return elements[(int)ele].amount;
+   
         }
 
         public double getcount(ele_names ele)
         {
+
+            if((int)ele>elements.Count)
+            {
+                Console.WriteLine("Element not found");
+                return 0;
+            }
+
             //Auto fudge the TTL entries for correct scalar
             if (ele > ele_names.ADJUST_TTL && ele < ele_names.PLU_LEVEL1_TTL)
             {
@@ -269,14 +339,28 @@ namespace libECRComms
 
             foreach (List<byte> bs in chunks)
             {
-                FinReportElement element = new FinReportElement();
-                Array.Copy(bs.ToArray(), 0, element.data, 0, 12);
-                element.decode();
-                elements.Add(element);
-                index++;
+                try
+                {
+                    FinReportElement element = new FinReportElement();
+                    Array.Copy(bs.ToArray(), 0, element.data, 0, 12);
+                    element.decode();
+                    elements.Add(element);
+                    index++;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Errors");
+                }
             }
 
-            grand = ECRComms.extractfloat3(data, 0x465);
+            try
+            {
+                grand = ECRComms.extractfloat3(data, 0x465);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Grand failed");
+            }
         }
 
         public override void encode()
@@ -285,22 +369,26 @@ namespace libECRComms
 
         public void dump()
         {
-            Console.WriteLine(String.Format("+PLU TTL {0} £{1}", getcount(ele_names.PLU_TTL), getvalue(ele_names.PLU_TTL)));
-            Console.WriteLine(String.Format("+ADJUST TTL {0}£{1}", getcount(ele_names.ADJUST_TTL), getvalue(ele_names.ADJUST_TTL)));
-            Console.WriteLine(String.Format("%1 {0} £{1}", getcount(ele_names.DISCOUNT1), getvalue(ele_names.DISCOUNT1)));
-            Console.WriteLine(String.Format("NET SALE {0} £{1}", getcount(ele_names.NETSALE), getvalue(ele_names.NETSALE)));
-            Console.WriteLine(String.Format("RETURN {0} £{1}", getcount(ele_names.RETURN), getvalue(ele_names.RETURN)));
-            Console.WriteLine(String.Format("VOID {0} £{1}", getcount(ele_names.VOID_MODE), getvalue(ele_names.VOID_MODE)));
-            Console.WriteLine(String.Format("CANCEL {0} £{1}", getcount(ele_names.CANCEL), getvalue(ele_names.CANCEL)));
-            Console.WriteLine(String.Format("GROSS SALES £{0} ", getvalue(ele_names.GROSSSALES)));
-            Console.WriteLine(String.Format("CASH SALES {0} £{1}", getcount(ele_names.CASHSALES), getvalue(ele_names.CASHSALES)));
-            Console.WriteLine(String.Format("NOSALE {0} ", getcount(ele_names.NOSALE)));
-            Console.WriteLine(String.Format("CASH-IN-D {0} £{1}", getcount(ele_names.CASH_IN_D), getvalue(ele_names.CASH_IN_D)));
-            Console.WriteLine(String.Format("CHG1-IN-D {0} £{1}", getcount(ele_names.CHG1_IN_D), getvalue(ele_names.CHG1_IN_D)));
-            Console.WriteLine(String.Format("CHG1 SALES {0} £{1}", getcount(ele_names.CHG1_SALES), getvalue(ele_names.CHG1_SALES)));
-            Console.WriteLine(String.Format("PLU LEVEL1 TTL {0} £{1}", getcount(ele_names.PLU_LEVEL1_TTL), getvalue(ele_names.PLU_LEVEL1_TTL)));
+
+            int i = 0;
+
+            
+            foreach (FinReportElement ele in elements)
+            {
+
+                ele_names name = (ele_names)i;
+
+                Console.WriteLine(String.Format("{0}\t{1}\t{2}",name.ToString(), getcount(name), getvalue(name)));
+                i++;
+            }
+
+
+            
+            Console.WriteLine("***********");
 
             Console.WriteLine(String.Format("GRAND {0} ", grand));
+
+            Console.WriteLine("***********");
         }
     }
 
